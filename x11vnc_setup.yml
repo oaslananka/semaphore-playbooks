@@ -3,8 +3,8 @@
   hosts: all
   become: true
   tasks:
-
     - name: Gerekli paketleri kur
+      become: true
       apt:
         name: x11vnc
         state: present
