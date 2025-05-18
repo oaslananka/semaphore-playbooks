@@ -1,0 +1,24 @@
+---
+- name: Docker container sağlık kontrolü
+  hosts: all
+  become: true
+
+  tasks:
+
+    - name: Container listesini al
+      shell: docker ps -a --format '{{.Names}} {{.Status}}'
+      register: container_status
+
+    - name: Sağlıksız ya da durmuş container'ları ayıkla
+      set_fact:
+        unhealthy_or_exited_containers: >-
+          {{ container_status.stdout_lines | select('search', 'Exited|unhealthy') | list }}
+
+    - name: Bilgi mesajı yazdır (loglamak için)
+      debug:
+        msg: "{{ unhealthy_or_exited_containers }}"
+
+    - name: Container'ları yeniden başlat
+      shell: docker restart {{ item.split()[0] }}
+      loop: "{{ unhealthy_or_exited_containers }}"
+      when: unhealthy_or_exited_containers | length > 0
