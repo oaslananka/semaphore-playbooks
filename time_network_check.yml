@@ -1,0 +1,31 @@
+---
+- name: Zaman ve Ağ Ayarları Kontrolü
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Sistem zamanı kontrol
+      command: timedatectl
+      register: time_output
+
+    - name: Zaman çıktısını göster
+      debug:
+        var: time_output.stdout_lines
+
+    - name: NTP senkronizasyon kontrolü
+      shell: |
+        timedatectl show -p NTPSynchronized --value
+      register: ntp_sync
+
+    - name: NTP durumu
+      debug:
+        msg: "NTP senkronizasyonu: {{ ntp_sync.stdout }}"
+
+    - name: Ağ bağlantısı testi
+      command: ping -c 3 8.8.8.8
+      register: ping_result
+      ignore_errors: yes
+
+    - name: Ping sonucu
+      debug:
+        var: ping_result.stdout_lines
