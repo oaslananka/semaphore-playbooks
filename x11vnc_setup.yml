@@ -1,0 +1,44 @@
+---
+- name: x11vnc Kurulumu ve Servis Olarak Başlatılması
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Gerekli paketleri kur
+      apt:
+        name: x11vnc
+        state: present
+        update_cache: true
+
+    - name: VNC şifresi dosyasını oluştur
+      expect:
+        command: x11vnc -storepasswd
+        responses:
+          (?i)password: "aco\n"
+          (?i)verify: "aco\n"
+      args:
+        creates: /home/aco/.vnc/passwd
+      become_user: aco
+
+    - name: systemd servis dosyasını oluştur
+      copy:
+        dest: /etc/systemd/system/x11vnc.service
+        content: |
+          [Unit]
+          Description=Start x11vnc at boot
+          After=multi-user.target
+
+          [Service]
+          Type=simple
+          ExecStart=/usr/bin/x11vnc -auth guess -forever -loop -noxdamage -repeat -rfbauth /home/aco/.vnc/passwd
+          User=aco
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: systemd servisini etkinleştir
+      shell: |
+        systemctl daemon-reexec
+        systemctl enable x11vnc.service
+        systemctl start x11vnc.service
