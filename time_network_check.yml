@@ -21,7 +21,7 @@
       debug:
         msg: "NTP senkronizasyonu: {{ ntp_sync.stdout }}"
 
-    - name: 🌐 Google DNS'e ping at (internet bağlantı kontrolü)
+    - name: 🌐 Google DNS’e ping at (internet bağlantı kontrolü)
       command: ping -c 3 8.8.8.8
       register: ping_result
       ignore_errors: true
@@ -29,3 +29,7 @@
     - name: Ping sonucu
       debug:
         var: ping_result.stdout_lines
+
+    - name: 🛠 RTC yerel saat olarak ayarlı mı? (uyarı varsa düzelt)
+      command: timedatectl set-local-rtc 0 --adjust-system-clock
+      when: "'RTC in local TZ: yes' in time_output.stdout"
