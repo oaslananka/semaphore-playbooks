@@ -1,0 +1,38 @@
+- name: Collect system diagnostics
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: Uptime kontrolü
+      shell: uptime
+      register: uptime_result
+
+    - name: Disk kullanım durumu (df -h)
+      shell: df -h
+      register: df_result
+
+    - name: Bellek durumu (free -h)
+      shell: free -h
+      register: mem_result
+
+    - name: Son sistem hataları (journalctl -xe -n 20)
+      shell: journalctl -xe -n 20
+      register: journal_result
+
+    - name: 📌 Uptime çıktısı
+      debug:
+        var: uptime_result.stdout_lines
+
+    - name: 📦 Disk bilgisi
+      debug:
+        var: df_result.stdout_lines
+
+    - name: 🧠 Bellek bilgisi
+      debug:
+        var: mem_result.stdout_lines
+
+    - name: ❗ Son 20 hata logu
+      debug:
+        var: journal_result.stdout_lines
