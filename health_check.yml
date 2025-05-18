@@ -5,15 +5,14 @@
 
   tasks:
     - name: Container listesini al
-      shell: "docker ps -a --format '{{.Names}} {{.Status}}'"
+      shell: >
+        docker ps -a --format "{{'{{.Names}} {{.Status}}'}}"
       register: container_status
 
     - name: Sağlıksız ya da durmuş container'ları ayıkla
       set_fact:
-        unhealthy_or_exited_containers: >-
-          {{ container_status.stdout_lines
-             | select('search', 'Exited|unhealthy')
-             | list }}
+        unhealthy_or_exited_containers: >
+          {{ container_status.stdout_lines | select('search', 'Exited|unhealthy') | list }}
 
     - name: Bilgi mesajı yazdır (loglamak için)
       debug:
