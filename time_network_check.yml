@@ -5,31 +5,42 @@
   gather_facts: no
 
   tasks:
+
     - name: 🕒 Sistem zamanı kontrol
       command: timedatectl
       register: time_output
 
-    - name: Zaman çıktısını yazdır
+    - name: 🖨 Zaman çıktısını yazdır
       debug:
         var: time_output.stdout_lines
 
-    - name: 🔁 NTP senkronizasyon durumu
+    - name: 🔄 NTP senkronizasyon durumu
       shell: timedatectl show -p NTPSynchronized --value
       register: ntp_sync
 
-    - name: NTP senkronizasyon sonucu
+    - name: 📢 NTP senkronizasyon sonucu
       debug:
         msg: "NTP senkronizasyonu: {{ ntp_sync.stdout }}"
 
-    - name: 🌐 Google DNS’e ping at (internet bağlantı kontrolü)
+    - name: 🌐 Google DNS'e ping at (internet bağlantı kontrolü)
       command: ping -c 3 8.8.8.8
       register: ping_result
       ignore_errors: true
 
-    - name: Ping sonucu
+    - name: 📡 Ping sonucu
       debug:
         var: ping_result.stdout_lines
 
-    - name: 🛠 RTC yerel saat olarak ayarlı mı? (uyarı varsa düzelt)
-      command: timedatectl set-local-rtc 0 --adjust-system-clock
+    - name: 🛠️ RTC yerel saat olarak ayarlı mı? (uyarı varsa düzelt)
+      shell: timedatectl set-local-rtc 0 --adjust-system-clock
       when: "'RTC in local TZ: yes' in time_output.stdout"
+      register: rtc_fix
+      retries: 3
+      delay: 5
+      until: rtc_fix.rc == 0
+      ignore_errors: true
+
+    - name: ❗ RTC düzeltme sonucu (hata varsa)
+      debug:
+        msg: "‼️ RTC düzeltme başarısız: {{ rtc_fix.stderr }}"
+      when: rtc_fix is failed
