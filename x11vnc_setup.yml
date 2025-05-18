@@ -8,7 +8,7 @@
       apt:
         name: x11vnc
         state: present
-        update_cache: true
+        update_cache: yes
 
     - name: VNC şifresi dosyasını oluştur
       expect:
@@ -16,7 +16,6 @@
         responses:
           (?i)password: "aco\n"
           (?i)verify: "aco\n"
-      args:
         creates: /home/aco/.vnc/passwd
       become_user: aco
 
@@ -37,7 +36,7 @@
           [Install]
           WantedBy=multi-user.target
 
-    - name: systemd servisini etkinleştir
+    - name: systemd servisini etkinleştir ve başlat
       shell: |
         systemctl daemon-reexec
         systemctl enable x11vnc.service
