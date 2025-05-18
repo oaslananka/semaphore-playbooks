@@ -1,30 +1,30 @@
 ---
-- name: Zaman ve Ağ Ayarları Kontrolü
+- name: Sistem Zamanı ve Ağ Kontrolü
   hosts: all
   become: true
+  gather_facts: no
 
   tasks:
-    - name: Sistem zamanı kontrol
+    - name: 🕒 Sistem zamanı kontrol
       command: timedatectl
       register: time_output
 
-    - name: Zaman çıktısını göster
+    - name: Zaman çıktısını yazdır
       debug:
         var: time_output.stdout_lines
 
-    - name: NTP senkronizasyon kontrolü
-      shell: |
-        timedatectl show -p NTPSynchronized --value
+    - name: 🔁 NTP senkronizasyon durumu
+      shell: timedatectl show -p NTPSynchronized --value
       register: ntp_sync
 
-    - name: NTP durumu
+    - name: NTP senkronizasyon sonucu
       debug:
         msg: "NTP senkronizasyonu: {{ ntp_sync.stdout }}"
 
-    - name: Ağ bağlantısı testi
+    - name: 🌐 Google DNS'e ping at (internet bağlantı kontrolü)
       command: ping -c 3 8.8.8.8
       register: ping_result
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Ping sonucu
       debug:
