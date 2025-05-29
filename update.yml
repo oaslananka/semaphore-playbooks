@@ -1,14 +1,18 @@
-- name: Update & upgrade packages
+# update.yml
+---
+- name: Cihazları Güncelle
   hosts: all
   become: yes
-  become_method: sudo
-  become_user: root
-
   tasks:
-    - name: Update package list
-      apt:
-        update_cache: yes
-
-    - name: Upgrade all packages
-      apt:
-        upgrade: dist
+    - name: Sistemi Güncelle
+      shell: |
+        unset HISTFILE
+        apt-get update
+        apt-get install -f -y
+        apt-get --fix-broken install -y
+        apt-get upgrade -y
+        apt-get full-upgrade -y
+        apt-get autoremove -y
+        apt-get autoclean
+      args:
+        executable: /bin/bash
