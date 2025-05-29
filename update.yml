@@ -1,18 +1,17 @@
-# update.yml
 ---
-- name: Cihazları Güncelle
+- name: Sistemi Güncelle
   hosts: all
-  become: yes
+  become: true
+  become_method: sudo
+
   tasks:
-    - name: Sistemi Güncelle
+    - name: Sistemi güncelle
       shell: |
         unset HISTFILE
-        apt-get update
+        apt-get update -y
         apt-get install -f -y
         apt-get --fix-broken install -y
         apt-get upgrade -y
         apt-get full-upgrade -y
         apt-get autoremove -y
-        apt-get autoclean
-      args:
-        executable: /bin/bash
+        apt-get autoclean -y
