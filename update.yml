@@ -8,10 +8,10 @@
     - name: Sistemi güncelle
       shell: |
         unset HISTFILE
-        apt-get update -y
-        apt-get install -f -y
-        apt-get --fix-broken install -y
-        apt-get upgrade -y
-        apt-get full-upgrade -y
-        apt-get autoremove -y
-        apt-get autoclean -y
+        sudo apt-get update -y
+        sudo apt-get install -f -y
+        sudo apt-get --fix-broken install -y
+        sudo apt-get upgrade -y
+        sudo apt-get full-upgrade -y
+        sudo apt-get autoremove -y
+        sudo apt-get autoclean -y
